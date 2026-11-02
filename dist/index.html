@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0074b9"><title>DAYKEDS | Catálogo</title><link rel="stylesheet" href="styles.css"></head>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0074b9"><title>DAYKEDS | Catálogo</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="campaign.css"></head>
 <body>
 <header><a class="brand" href="#" id="brand"><img src="logo.png" alt=""><span>DAYKEDS<small>DISTRIBUIDOR TEXTIL</small></span></a><button id="cart-button" class="primary">Mi solicitud <span id="count">0</span></button></header>
 <main><div class="heading"><div><p class="eyebrow">HECHO PARA TU MARCA</p><h1>Catálogo</h1></div><span class="tag">Atención personalizada</span></div>
 <label class="search">Buscar producto<input id="search" type="search" placeholder="Nombre o código del producto" autocomplete="off"></label>
 <p id="status" role="status">Cargando catálogo…</p><button id="retry" hidden>Volver a intentar</button><section id="products" class="grid" aria-label="Productos"></section>
-<footer>DAYKEDS · Textiles para tu negocio<br><span>Los precios y la fecha de entrega se confirman al cotizar.</span></footer></main>
+<footer>DAYKEDS · Textiles para tu negocio<br><span>Pedido mínimo: 12 polos. Cada talla seleccionada debe sumar al menos 3 polos, incluso si combinas diseños. Los precios y la fecha de entrega se confirman al cotizar.</span></footer></main>
 <dialog id="cart"><div class="dialog-head"><h2>Tu solicitud</h2><button class="close" aria-label="Cerrar" id="close">×</button></div><div id="items"></div><p id="units"></p>
-<form id="checkout"><h3>¿Con quién conversamos?</h3><label>Nombre completo o empresa<input name="nombre" required minlength="2" maxlength="150" autocomplete="name"></label>
+<p id="size-rules" aria-live="polite"></p><form id="checkout"><h3>¿Con quién conversamos?</h3><label>Nombre completo o empresa<input name="nombre" required minlength="2" maxlength="150" autocomplete="name"></label>
 <div class="phone"><label>País<select name="pais"><option value="51">Perú +51</option><option value="">Otro país</option></select></label><label>WhatsApp<input name="telefono" type="tel" required maxlength="22" autocomplete="tel" placeholder="987 654 321"></label></div>
 <label>DNI / RUC <span>(opcional)</span><input name="documento" inputmode="numeric" maxlength="11" pattern="([0-9]{8}|[0-9]{11})?" placeholder="8 u 11 dígitos"></label>
 <label>Detalles del pedido <span>(opcional)</span><textarea name="observaciones" rows="3" maxlength="2000" placeholder="Estampado, fecha deseada, destino…"></textarea></label>

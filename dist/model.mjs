@@ -20,3 +20,27 @@ export function addItem(cart, item) {
   else { if(next.length >= 50) throw new Error('Máximo 50 productos diferentes por solicitud.'); next.push({...item, cantidad:quantity(item.cantidad)}); }
   return next;
 }
+
+export function orderSummary(cart) {
+  const quantitiesBySize = new Map();
+  let total = 0;
+
+  for (const item of cart) {
+    const itemQuantity = quantity(item.cantidad);
+    total += itemQuantity;
+    const size = String(item.talla || '').trim();
+    if (size) quantitiesBySize.set(size, (quantitiesBySize.get(size) || 0) + itemQuantity);
+  }
+
+  const incompleteSizes = [...quantitiesBySize.entries()]
+    .filter(([, itemQuantity]) => itemQuantity < 3)
+    .map(([size, itemQuantity]) => ({size, quantity: itemQuantity, missing: 3 - itemQuantity}));
+
+  return {
+    total,
+    quantitiesBySize: Object.fromEntries(quantitiesBySize),
+    incompleteSizes,
+    hasMinimumOrder: total >= 12,
+    canRequest: total >= 12 && incompleteSizes.length === 0,
+  };
+}
