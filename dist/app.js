@@ -167,7 +167,7 @@ function openDetail(product) {
   const description = node('p', product.descripcion || 'Escoge la talla y color que prefieras.', 'detail-description');
   const priceDetails = node('details');
   priceDetails.className = 'price-details';
-  priceDetails.open = true;
+  priceDetails.open = false;
   priceDetails.append(node('summary', 'Ver precios por talla'), priceTable(product));
   const pickerTitle = node('h3', 'Elige tus tallas');
   const help = node('p', 'La primera vez que tocas una talla se agregan 3 prendas. Luego ajusta de uno en uno.', 'size-help');
@@ -198,8 +198,12 @@ function openDetail(product) {
   };
   for (const size of sizes) {
     const config = sizeConfig(product, size);
-    const button = node('button', size, 'size-choice');
+    const button = node('button', undefined, 'size-choice');
     button.type = 'button'; button.dataset.size = size;
+    button.append(
+      node('strong', size),
+      node('small', config.available ? money(config.price) : 'Agotada'),
+    );
     if (!config.available) { button.disabled = true; button.classList.add('sold-out'); button.title = 'Talla agotada'; }
     button.onclick = () => { if (!draft.quantities.has(size)) draft.quantities.set(size, 3); renderSelection(); };
     picker.append(button);
@@ -214,9 +218,9 @@ function openDetail(product) {
       setTimeout(() => { add.textContent = 'Agregar diseño al pedido'; }, 1200);
     } catch (error) { alert(error.message); }
   };
-  const more = node('button', 'Escoger otro diseño', 'secondary');
-  more.type = 'button'; more.onclick = () => $('detail').close();
-  body.append(viewer, dots, colorName, description, priceDetails, pickerTitle, help, picker, selected, subtotal, add, more);
+  const actionBar = node('div', undefined, 'detail-action-bar');
+  actionBar.append(subtotal, add);
+  body.append(viewer, dots, colorName, description, priceDetails, pickerTitle, help, picker, selected, actionBar);
   refresh(); renderSelection();
   $('detail').showModal();
 }
