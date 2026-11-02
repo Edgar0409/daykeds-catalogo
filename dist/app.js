@@ -15,6 +15,7 @@ async function rpc(name, body) {
   return result;
 }
 function field(label, name, max) {const wrap=node('label',label);const input=node('input');input.name=name;input.maxLength=max;wrap.append(input);return wrap;}
+function money(value) { return new Intl.NumberFormat('es-PE',{style:'currency',currency:'PEN'}).format(Number(value||0)); }
 function renderProducts() {
   $('products').replaceChildren();
   const term=$('search').value.toLowerCase().trim();
@@ -24,23 +25,23 @@ function renderProducts() {
     const article=node('article',undefined,'product');const img=node('img');img.className='photo';img.loading='lazy';img.alt=p.nombre;
     const fallback=()=>{img.onerror=null;img.src='logo.png';img.classList.add('fallback');img.alt='DAYKEDS';};
     if(p.imagen_url?.startsWith('https://')) {img.src=p.imagen_url;img.onerror=fallback;}else fallback();
-    const content=node('div',undefined,'product-content');content.append(node('p',p.codigo,'code'),node('h2',p.nombre),node('p',p.descripcion||'','description'),node('p','Precio a cotizar','quote-price'));
+    const content=node('div',undefined,'product-content');content.append(node('p',p.codigo,'code'),node('h2',p.nombre),node('p',p.descripcion||'','description'),node('p',money(p.precio),'quote-price'));
     const form=node('form');const variants=node('div',undefined,'variants');variants.append(field('Color (opcional)','color',80),field('Talla (opcional)','talla',30));
     const row=node('div',undefined,'add-row');const label=node('label','Cantidad');const input=node('input');Object.assign(input,{type:'number',min:'1',max:'100000',step:'1',value:'1',required:true,name:'cantidad'});label.append(input);
     const add=node('button','Agregar','primary');add.type='submit';row.append(label,add);form.append(variants,row);content.append(form);article.append(img,content);$('products').append(article);
-    form.addEventListener('submit',e=>{e.preventDefault();try{const data=new FormData(form);cart=addItem(cart,{producto_id:p.id,nombre:p.nombre,cantidad:quantity(data.get('cantidad')),color:data.get('color').trim(),talla:data.get('talla').trim()});pending=null;save();renderCart();add.textContent='Agregado';setTimeout(()=>add.textContent='Agregar',1200);}catch(error){alert(error.message);}});
+    form.addEventListener('submit',e=>{e.preventDefault();try{const data=new FormData(form);cart=addItem(cart,{producto_id:p.id,nombre:p.nombre,precio:Number(p.precio),cantidad:quantity(data.get('cantidad')),color:data.get('color').trim(),talla:data.get('talla').trim()});pending=null;save();renderCart();add.textContent='Agregado';setTimeout(()=>add.textContent='Agregar',1200);}catch(error){alert(error.message);}});
   }
 }
 function renderCart() {
   $('items').replaceChildren();$('count').textContent=cart.length;
   cart.forEach((item,i)=>{
-    const row=node('div',undefined,'cart-item');const desc=node('div');desc.append(node('strong',item.nombre),node('small',[item.color,item.talla].filter(Boolean).join(' · ')));
+    const row=node('div',undefined,'cart-item');const desc=node('div');desc.append(node('strong',item.nombre),node('small',[item.color,item.talla].filter(Boolean).join(' · ')),node('small',`${money(item.precio)} × ${item.cantidad} = ${money(Number(item.precio||0)*item.cantidad)}`));
     const input=node('input');Object.assign(input,{type:'number',min:'1',max:'100000',step:'1',value:String(item.cantidad)});input.setAttribute('aria-label',`Cantidad de ${item.nombre}`);
     input.onchange=()=>{try{item.cantidad=quantity(input.value);pending=null;save();renderCart();}catch(e){input.value=item.cantidad;alert(e.message);}};
     const remove=node('button','×');remove.setAttribute('aria-label',`Quitar ${item.nombre}`);remove.onclick=()=>{cart.splice(i,1);pending=null;save();renderCart();};
     row.append(desc,input,remove);$('items').append(row);
   });
-  $('units').textContent=cart.length?`${cart.reduce((n,x)=>n+x.cantidad,0)} unidades en tu solicitud`:'Tu solicitud está vacía.';
+  $('units').textContent=cart.length?`${cart.reduce((n,x)=>n+x.cantidad,0)} unidades · Total referencial ${money(cart.reduce((n,x)=>n+Number(x.precio||0)*x.cantidad,0))}`:'Tu solicitud está vacía.';
   $('send').disabled=!cart.length||sending;
 }
 async function load() {
