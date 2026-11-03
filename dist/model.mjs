@@ -22,25 +22,27 @@ export function addItem(cart, item) {
 }
 
 export function orderSummary(cart) {
-  const quantitiesBySize = new Map();
   let total = 0;
+  const incompleteItems = [];
 
   for (const item of cart) {
     const itemQuantity = quantity(item.cantidad);
     total += itemQuantity;
-    const size = String(item.talla || '').trim();
-    if (size) quantitiesBySize.set(size, (quantitiesBySize.get(size) || 0) + itemQuantity);
+    if (itemQuantity < 2) {
+      incompleteItems.push({
+        productoId: item.producto_id,
+        color: String(item.color || '').trim(),
+        talla: String(item.talla || '').trim(),
+        quantity: itemQuantity,
+        missing: 2 - itemQuantity,
+      });
+    }
   }
-
-  const incompleteSizes = [...quantitiesBySize.entries()]
-    .filter(([, itemQuantity]) => itemQuantity < 3)
-    .map(([size, itemQuantity]) => ({size, quantity: itemQuantity, missing: 3 - itemQuantity}));
 
   return {
     total,
-    quantitiesBySize: Object.fromEntries(quantitiesBySize),
-    incompleteSizes,
+    incompleteItems,
     hasMinimumOrder: total >= 12,
-    canRequest: total >= 12 && incompleteSizes.length === 0,
+    canRequest: total >= 12 && incompleteItems.length === 0,
   };
 }

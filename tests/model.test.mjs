@@ -14,17 +14,18 @@ test('Combina variantes iguales y conserva tallas distintas',()=>{
   assert.equal(added[0].cantidad,6);assert.equal(original[0].cantidad,3);
   assert.equal(addItem(added,{...item,talla:'M'}).length,2);
 });
-test('El mínimo por talla se acumula entre diseños',()=>{
+test('Cada combinación de diseño, color y talla requiere dos unidades',()=>{
   const cart=[
     {producto_id:1,cantidad:2,color:'Rojo',talla:'4'},
-    {producto_id:2,cantidad:1,color:'Verde',talla:'4'},
-    {producto_id:1,cantidad:3,color:'Rojo',talla:'S'},
-    {producto_id:2,cantidad:3,color:'Verde',talla:'M'},
-    {producto_id:3,cantidad:3,color:'Rojo',talla:'L'},
+    {producto_id:2,cantidad:2,color:'Verde',talla:'4'},
+    {producto_id:1,cantidad:2,color:'Rojo',talla:'S'},
+    {producto_id:2,cantidad:2,color:'Verde',talla:'M'},
+    {producto_id:3,cantidad:4,color:'Rojo',talla:'L'},
   ];
   const summary=orderSummary(cart);
   assert.equal(summary.total,12);
-  assert.equal(summary.quantitiesBySize['4'],3);
   assert.equal(summary.canRequest,true);
-  assert.equal(orderSummary([{producto_id:1,cantidad:2,talla:'4'}]).incompleteSizes[0].missing,1);
+  const incomplete=orderSummary([{producto_id:1,cantidad:1,color:'Rojo',talla:'4'}]);
+  assert.equal(incomplete.incompleteItems[0].missing,1);
+  assert.equal(incomplete.canRequest,false);
 });
