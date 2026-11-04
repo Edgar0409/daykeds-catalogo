@@ -62,6 +62,7 @@
 .cart-item-actions { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
 .cart-item-actions .cart-edit { padding: 5px; border: 0; background: transparent; color: #087abb; font-size: 12px; font-weight: 800; }
 .cart-item-actions .cart-remove { padding: 5px; border: 0; background: transparent; color: #8b3030; font-size: 22px; line-height: 1; }
+.cart-color-title { margin: 14px 0 4px; padding: 7px 9px; border-radius: 7px; background: #e7f4fb; color: #075f98; font-size: 12px; font-weight: 800; text-transform: uppercase; }
 @media (max-width: 560px) {
   .cart-item { grid-template-columns: minmax(0, 1fr) 52px 70px; gap: 6px; }
   .cart-item-actions .cart-edit { font-size: 11px; }

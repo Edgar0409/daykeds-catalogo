@@ -270,7 +270,22 @@ function renderCart() {
   const summary = orderSummary(cart);
   $('count').textContent = summary.total;
   $('cart-total').textContent = money(cartTotal());
-  for (const [index, item] of cart.entries()) {
+  const orderedItems = cart
+    .map((item, index) => ({item, index}))
+    .sort((a, b) => {
+      const color = String(a.item.color || '').localeCompare(String(b.item.color || ''), 'es');
+      if (color) return color;
+      const design = String(a.item.nombre || '').localeCompare(String(b.item.nombre || ''), 'es');
+      if (design) return design;
+      return String(a.item.talla || '').localeCompare(String(b.item.talla || ''), 'es', {numeric: true});
+    });
+  let currentColor = null;
+  for (const {item, index} of orderedItems) {
+    const color = item.color || 'Por confirmar';
+    if (color !== currentColor) {
+      $('items').append(node('p', 'Color: ' + color, 'cart-color-title'));
+      currentColor = color;
+    }
     const row = node('div', undefined, 'cart-item');
     const description = node('div');
     description.append(node('strong', item.nombre), node('small', [item.color, 'Talla ' + item.talla].filter(Boolean).join(' · ')), node('small', money(item.precio) + ' × ' + item.cantidad + ' = ' + money(Number(item.precio || 0) * item.cantidad)));
