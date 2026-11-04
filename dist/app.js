@@ -140,13 +140,13 @@ function openDetail(product) {
   body.replaceChildren();
   const productIndex = products.findIndex(item => item.id === product.id);
   const nav = node('div', undefined, 'design-nav');
-  const previous = node('button', '‹', 'design-nav-button');
+  const previous = node('button', '← Anterior', 'design-nav-button');
   previous.type = 'button';
   previous.disabled = productIndex <= 0;
   previous.setAttribute('aria-label', 'Ver diseño anterior');
   previous.onclick = () => openDetail(products[productIndex - 1]);
   const position = node('span', 'Diseño ' + (productIndex + 1) + ' de ' + products.length, 'design-position');
-  const next = node('button', '›', 'design-nav-button');
+  const next = node('button', 'Siguiente →', 'design-nav-button');
   next.type = 'button';
   next.disabled = productIndex < 0 || productIndex >= products.length - 1;
   next.setAttribute('aria-label', 'Ver siguiente diseño');

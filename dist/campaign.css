@@ -26,9 +26,33 @@
 }
 .detail-action-bar .design-subtotal { margin: 0 0 10px; }
 .detail-action-bar button { width: 100%; }
-.design-nav { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; margin: 0 0 12px; }
-.design-nav-button { min-height: 38px; padding: 0; border-radius: 50%; font-size: 29px; line-height: 1; color: #087abb; }
-.design-position { text-align: center; color: #49616f; font-size: 13px; font-weight: 800; }
+.design-nav {
+  position: sticky;
+  top: -1px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: minmax(94px, 1fr) auto minmax(94px, 1fr);
+  align-items: center;
+  gap: 7px;
+  margin: -2px 0 12px;
+  padding: 8px 0;
+  background: #fff;
+  border-bottom: 1px solid #dce7ed;
+}
+.design-nav-button {
+  min-height: 38px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: 1px solid #9cc9e0;
+  background: #f4fbff;
+  color: #087abb;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.design-nav-button:last-child { text-align: right; }
+.design-nav-button:disabled { opacity: .42; }
+.design-position { text-align: center; color: #49616f; font-size: 12px; font-weight: 800; white-space: nowrap; }
 @media (max-width: 560px) {
   .detail-action-bar { bottom: -16px; margin: 18px -16px -16px; padding: 12px 16px 16px; }
 }
