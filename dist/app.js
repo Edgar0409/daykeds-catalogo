@@ -132,9 +132,17 @@ function getDraft(product) {
   return drafts.get(product.id);
 }
 
-function openDetail(product) {
+function openDetail(product, cartIndex = null) {
   activeProduct = product;
   const draft = getDraft(product);
+  const editingItem = Number.isInteger(cartIndex) ? cart[cartIndex] : null;
+  if (Number.isInteger(cartIndex) && !editingItem) return;
+  if (editingItem) {
+    const matchingImage = imagesFor(product).find(image => image.color === editingItem.color);
+    draft.color = editingItem.color || imagesFor(product)[0].color;
+    draft.imageUrl = matchingImage?.url || imagesFor(product)[0].url;
+    draft.quantities = new Map([[String(editingItem.talla || ''), quantity(editingItem.cantidad)]]);
+  }
   $('detail-title').textContent = product.nombre;
   const body = $('detail-body');
   body.replaceChildren();
@@ -186,7 +194,7 @@ function openDetail(product) {
   const picker = node('div', undefined, 'size-picker');
   const selected = node('div', undefined, 'selected-sizes');
   const subtotal = node('p', undefined, 'design-subtotal');
-  const add = node('button', 'Agregar diseño al pedido', 'primary');
+  const add = node('button', editingItem ? 'Guardar cambios' : 'Agregar diseño al pedido', 'primary');
   add.type = 'button';
   const renderSelection = () => {
     selected.replaceChildren();
@@ -222,12 +230,21 @@ function openDetail(product) {
   }
   add.onclick = () => {
     try {
+      let nextCart = editingItem
+        ? cart.filter((_, index) => index !== cartIndex)
+        : cart;
       for (const [talla, cantidad] of draft.quantities) {
-        cart = addItem(cart, {producto_id: product.id, nombre: product.nombre, precio: priceForSize(product, talla), cantidad: quantity(cantidad), color: draft.color, talla});
+        nextCart = addItem(nextCart, {producto_id: product.id, nombre: product.nombre, precio: priceForSize(product, talla), cantidad: quantity(cantidad), color: draft.color, talla});
       }
+      cart = nextCart;
       draft.quantities.clear(); pending = null; save(); renderCart(); renderSelection();
-      add.textContent = 'Agregado al pedido';
-      setTimeout(() => { add.textContent = 'Agregar diseño al pedido'; }, 1200);
+      if (editingItem) {
+        $('detail').close();
+        $('cart').showModal();
+      } else {
+        add.textContent = 'Agregado al pedido';
+        setTimeout(() => { add.textContent = 'Agregar diseño al pedido'; }, 1200);
+      }
     } catch (error) { alert(error.message); }
   };
   const actionBar = node('div', undefined, 'detail-action-bar');
@@ -261,10 +278,22 @@ function renderCart() {
     Object.assign(input, {type: 'number', min: '1', max: '100000', step: '1', value: String(item.cantidad)});
     input.setAttribute('aria-label', 'Cantidad de ' + item.nombre + ', talla ' + item.talla);
     input.onchange = () => { try { item.cantidad = quantity(input.value); pending = null; save(); renderCart(); } catch (error) { input.value = item.cantidad; alert(error.message); } };
-    const remove = node('button', '×');
+    const actions = node('div', undefined, 'cart-item-actions');
+    const edit = node('button', 'Editar', 'cart-edit');
+    edit.type = 'button';
+    edit.setAttribute('aria-label', 'Editar ' + item.nombre + ', talla ' + item.talla);
+    edit.onclick = () => {
+      const product = products.find(candidate => candidate.id === item.producto_id);
+      if (!product) { alert('Este diseño ya no está disponible para editar. Puedes quitarlo de la solicitud.'); return; }
+      $('cart').close();
+      openDetail(product, index);
+    };
+    const remove = node('button', '×', 'cart-remove');
+    remove.type = 'button';
     remove.setAttribute('aria-label', 'Quitar ' + item.nombre + ', talla ' + item.talla);
     remove.onclick = () => { cart.splice(index, 1); pending = null; save(); renderCart(); };
-    row.append(description, input, remove); $('items').append(row);
+    actions.append(edit, remove);
+    row.append(description, input, actions); $('items').append(row);
   }
   $('units').textContent = cart.length ? summary.total + ' prendas en tu solicitud' : 'Tu solicitud está vacía.';
   $('cart-grand-total').textContent = cart.length ? money(cartTotal()) : '';
