@@ -99,12 +99,10 @@ async function rpc(name, body) {
 }
 
 function sizeRules(summary) {
-  if (!summary.total) return 'Elige diseño, color y talla. Cada combinación inicia con 2 prendas.';
-  if (summary.incompleteItems.length) {
-    return 'Cada combinación de diseño, color y talla debe tener al menos 2 prendas.';
-  }
+  if (!summary.total) return 'Elige diseño, color y talla para comenzar tu pedido.';
   if (!summary.hasMinimumOrder) return 'Faltan ' + (12 - summary.total) + ' prendas para el pedido mínimo.';
-  return summary.total + ' prendas. Pedido mínimo completado.';
+  if (!summary.hasMinimumSizes) return 'Elige ' + (4 - summary.distinctSizes) + ' talla' + (4 - summary.distinctSizes === 1 ? '' : 's') + ' distinta' + (4 - summary.distinctSizes === 1 ? '' : 's') + ' más. Llevas ' + summary.distinctSizes + ' de 4.';
+  return summary.total + ' prendas en ' + summary.distinctSizes + ' tallas distintas. Pedido mínimo completado.';
 }
 
 function renderProducts() {
@@ -170,7 +168,7 @@ function openDetail(product) {
   priceDetails.open = false;
   priceDetails.append(node('summary', 'Ver precios por talla'), priceTable(product));
   const pickerTitle = node('h3', 'Elige tus tallas');
-  const help = node('p', 'Cada combinación de diseño, color y talla inicia con 2 prendas. Luego puedes aumentar de una en una.', 'size-help');
+  const help = node('p', 'Elige las tallas y ajusta las cantidades libremente. El pedido final debe tener 12 prendas y 4 tallas distintas como mínimo.', 'size-help');
   const picker = node('div', undefined, 'size-picker');
   const selected = node('div', undefined, 'selected-sizes');
   const subtotal = node('p', undefined, 'design-subtotal');
@@ -186,7 +184,7 @@ function openDetail(product) {
       info.append(node('strong', 'Talla ' + size), node('small', money(priceForSize(product, size)) + ' por unidad'));
       const controls = node('div', undefined, 'quantity-stepper');
       const minus = node('button', '−'); minus.type = 'button';
-      minus.onclick = () => { if (amount === 2) draft.quantities.delete(size); else draft.quantities.set(size, amount - 1); renderSelection(); };
+      minus.onclick = () => { if (amount === 1) draft.quantities.delete(size); else draft.quantities.set(size, amount - 1); renderSelection(); };
       const value = node('span', String(amount));
       const plus = node('button', '+'); plus.type = 'button';
       plus.onclick = () => { draft.quantities.set(size, amount + 1); renderSelection(); };
@@ -205,7 +203,7 @@ function openDetail(product) {
       node('small', config.available ? money(config.price) : 'Agotada'),
     );
     if (!config.available) { button.disabled = true; button.classList.add('sold-out'); button.title = 'Talla agotada'; }
-    button.onclick = () => { if (!draft.quantities.has(size)) draft.quantities.set(size, 2); renderSelection(); };
+    button.onclick = () => { if (!draft.quantities.has(size)) draft.quantities.set(size, 1); renderSelection(); };
     picker.append(button);
   }
   add.onclick = () => {
@@ -235,7 +233,7 @@ function renderCart() {
     const description = node('div');
     description.append(node('strong', item.nombre), node('small', [item.color, 'Talla ' + item.talla].filter(Boolean).join(' · ')), node('small', money(item.precio) + ' × ' + item.cantidad + ' = ' + money(Number(item.precio || 0) * item.cantidad)));
     const input = node('input');
-    Object.assign(input, {type: 'number', min: '2', max: '100000', step: '1', value: String(item.cantidad)});
+    Object.assign(input, {type: 'number', min: '1', max: '100000', step: '1', value: String(item.cantidad)});
     input.setAttribute('aria-label', 'Cantidad de ' + item.nombre + ', talla ' + item.talla);
     input.onchange = () => { try { item.cantidad = quantity(input.value); pending = null; save(); renderCart(); } catch (error) { input.value = item.cantidad; alert(error.message); } };
     const remove = node('button', '×');
