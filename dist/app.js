@@ -138,6 +138,20 @@ function openDetail(product) {
   $('detail-title').textContent = product.nombre;
   const body = $('detail-body');
   body.replaceChildren();
+  const productIndex = products.findIndex(item => item.id === product.id);
+  const nav = node('div', undefined, 'design-nav');
+  const previous = node('button', '‹', 'design-nav-button');
+  previous.type = 'button';
+  previous.disabled = productIndex <= 0;
+  previous.setAttribute('aria-label', 'Ver diseño anterior');
+  previous.onclick = () => openDetail(products[productIndex - 1]);
+  const position = node('span', 'Diseño ' + (productIndex + 1) + ' de ' + products.length, 'design-position');
+  const next = node('button', '›', 'design-nav-button');
+  next.type = 'button';
+  next.disabled = productIndex < 0 || productIndex >= products.length - 1;
+  next.setAttribute('aria-label', 'Ver siguiente diseño');
+  next.onclick = () => openDetail(products[productIndex + 1]);
+  nav.append(previous, position, next);
   const viewer = imageNode(product, 'detail-photo');
   viewer.src = draft.imageUrl;
   const dots = node('div', undefined, 'color-dots');
@@ -218,9 +232,20 @@ function openDetail(product) {
   };
   const actionBar = node('div', undefined, 'detail-action-bar');
   actionBar.append(subtotal, add);
-  body.append(viewer, dots, colorName, description, priceDetails, pickerTitle, help, picker, selected, actionBar);
+  let swipeStartX;
+  body.ontouchstart = event => { swipeStartX = event.touches[0]?.clientX; };
+  body.ontouchend = event => {
+    const endX = event.changedTouches[0]?.clientX;
+    if (swipeStartX === undefined || endX === undefined) return;
+    const distance = endX - swipeStartX;
+    swipeStartX = undefined;
+    if (Math.abs(distance) < 60) return;
+    if (distance < 0 && productIndex < products.length - 1) openDetail(products[productIndex + 1]);
+    if (distance > 0 && productIndex > 0) openDetail(products[productIndex - 1]);
+  };
+  body.append(nav, viewer, dots, colorName, description, priceDetails, pickerTitle, help, picker, selected, actionBar);
   refresh(); renderSelection();
-  $('detail').showModal();
+  if (!$('detail').open) $('detail').showModal();
 }
 
 function renderCart() {
