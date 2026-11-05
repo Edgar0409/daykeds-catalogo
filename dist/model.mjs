@@ -23,20 +23,15 @@ export function addItem(cart, item) {
 
 export function orderSummary(cart) {
   let total = 0;
-  const sizes = new Set();
 
   for (const item of cart) {
     const itemQuantity = quantity(item.cantidad);
     total += itemQuantity;
-    const size = String(item.talla || '').trim();
-    if (size) sizes.add(size);
   }
 
   return {
     total,
-    distinctSizes: sizes.size,
     hasMinimumOrder: total >= 12,
-    hasMinimumSizes: sizes.size >= 4,
-    canRequest: total >= 12 && sizes.size >= 4,
+    canRequest: total >= 12,
   };
 }

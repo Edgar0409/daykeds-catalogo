@@ -101,8 +101,7 @@ async function rpc(name, body) {
 function sizeRules(summary) {
   if (!summary.total) return 'Elige diseño, color y talla para comenzar tu pedido.';
   if (!summary.hasMinimumOrder) return 'Faltan ' + (12 - summary.total) + ' prendas para el pedido mínimo.';
-  if (!summary.hasMinimumSizes) return 'Elige ' + (4 - summary.distinctSizes) + ' talla' + (4 - summary.distinctSizes === 1 ? '' : 's') + ' distinta' + (4 - summary.distinctSizes === 1 ? '' : 's') + ' más. Llevas ' + summary.distinctSizes + ' de 4.';
-  return summary.total + ' prendas en ' + summary.distinctSizes + ' tallas distintas. Pedido mínimo completado.';
+  return summary.total + ' prendas. Pedido mínimo completado.';
 }
 
 function renderProducts() {
@@ -190,7 +189,7 @@ function openDetail(product, cartIndex = null) {
   priceDetails.open = false;
   priceDetails.append(node('summary', 'Ver precios por talla'), priceTable(product));
   const pickerTitle = node('h3', 'Elige tus tallas');
-  const help = node('p', 'Elige las tallas y ajusta las cantidades libremente. El pedido final debe tener 12 prendas y 4 tallas distintas como mínimo.', 'size-help');
+  const help = node('p', 'Elige las tallas y ajusta las cantidades libremente. El pedido mínimo es de 12 prendas.', 'size-help');
   const picker = node('div', undefined, 'size-picker');
   const selected = node('div', undefined, 'selected-sizes');
   const subtotal = node('p', undefined, 'design-subtotal');

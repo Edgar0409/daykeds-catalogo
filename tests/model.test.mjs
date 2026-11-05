@@ -14,18 +14,10 @@ test('Combina variantes iguales y conserva tallas distintas',()=>{
   assert.equal(added[0].cantidad,6);assert.equal(original[0].cantidad,3);
   assert.equal(addItem(added,{...item,talla:'M'}).length,2);
 });
-test('El pedido requiere doce unidades y cuatro tallas distintas',()=>{
-  const cart=[
-    {producto_id:1,cantidad:1,color:'Rojo',talla:'4'},
-    {producto_id:2,cantidad:4,color:'Verde',talla:'6'},
-    {producto_id:1,cantidad:3,color:'Rojo',talla:'S'},
-    {producto_id:3,cantidad:4,color:'Rojo',talla:'M'},
-  ];
-  const summary=orderSummary(cart);
-  assert.equal(summary.total,12);
-  assert.equal(summary.distinctSizes,4);
-  assert.equal(summary.canRequest,true);
-  const incomplete=orderSummary([{producto_id:1,cantidad:12,color:'Rojo',talla:'4'}]);
-  assert.equal(incomplete.distinctSizes,1);
+test('El pedido requiere doce unidades como mínimo',()=>{
+  const complete=orderSummary([{producto_id:1,cantidad:12,color:'Rojo',talla:'4'}]);
+  assert.equal(complete.total,12);
+  assert.equal(complete.canRequest,true);
+  const incomplete=orderSummary([{producto_id:1,cantidad:11,color:'Rojo',talla:'4'}]);
   assert.equal(incomplete.canRequest,false);
 });
